@@ -10,4 +10,13 @@ class Api::ProductsController < ApplicationController
     render 'all_products.json.jbuilder'
   end
 
+  def query_product
+    id = params[:id]
+    @product = Product.all.find(id)
+    render 'query_product.json.jbuilder'
+  end
+
+  # def 
+    
+  # end
 end
