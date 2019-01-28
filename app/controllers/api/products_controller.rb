@@ -8,22 +8,22 @@ class Api::ProductsController < ApplicationController
       @products = @products.where("name iLIKE ?", "%#{search_terms}%")
     end
 
-    price = params[:sort]
-    if price
-      @products = @products.order(price: "ASC")
-    end
-
-    desc = params[:sort_order]
-    if desc
-      @products = @products.order(price: "DESC")
-    end
-
-    discounted = params[:discounted]
-    if discounted
+    discount = params[:discount]
+    if discount
       @products = @products.where("price <= ?", 3)
     end
 
-    @products = @products.order(id: "ASC")
+    sort_attribute = params[:sort]
+    sort_order = params[:sort_order]
+
+    if sort_attribute && sort_order #to prevent it from breaking, since it can't run /w just sort_attribute
+      @products = @products.order(sort_attribute => sort_order)
+    elsif sort_attribute
+      @products = @products.order(sort_attribute)
+    else
+      @products = @products.order(:id)
+    end
+
 
 
     render 'index.json.jbuilder'
@@ -39,8 +39,8 @@ class Api::ProductsController < ApplicationController
     @product = Product.new(
                             name: params[:name],
                             price: params[:price],
-                            image_url: params[:image_url],
-                            description: params[:description]
+                            description: params[:description],
+                            supplier_id: params[:supplier_id]
                           )
     if @product.save
       render 'show.json.jbuilder'
@@ -55,9 +55,10 @@ class Api::ProductsController < ApplicationController
 
     @product.name = params[:name] || @product.name 
     @product.price = params[:price] || @product.price 
-    @product.image_url = params[:image_url] || @product.image_url 
     @product.description = params[:description] || @product.description 
     @product.in_stock = params[:in_stock] || @product.in_stock 
+    @product.supplier_id = params[:supplier_id] || @product.supplier_id 
+
 
     if @product.save
       render 'show.json.jbuilder'
