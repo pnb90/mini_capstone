@@ -1,7 +1,8 @@
 class Api::OrdersController < ApplicationController
+  before_action :authenticate_user
 
   def index
-    @orders = Order.all
+    @orders = current_user.orders #if current user exists, by logging in, then execute this block, which displays all the orders for the current user. using the orders association method defined by the belongs_to method in the model
     render 'index.json.jbuilder'
   end
   
@@ -24,12 +25,10 @@ class Api::OrdersController < ApplicationController
                       tax: calculated_tax,
                       total: calculated_total
                       )
-
     if @order.save
       render 'show.json.jbuilder'
     else
       render json: {errors: @order.errors.full_messages}, status: :unprocessable_entity
     end
   end
-
 end
