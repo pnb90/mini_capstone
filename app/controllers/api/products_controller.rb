@@ -4,6 +4,12 @@ class Api::ProductsController < ApplicationController
   def index
     @products = Product.all
 
+    category_name = params[:category]
+    if category_name
+      category = Category.find_by(name: category_name)
+      @products = category.products  
+    end
+
     search_terms = params[:search]
     if search_terms
       @products = @products.where("name iLIKE ?", "%#{search_terms}%")
